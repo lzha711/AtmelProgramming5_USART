@@ -1,7 +1,7 @@
 /*
  * UART.c
  * Echoing string received by Atmega328P (from virtual/physical serial com port), and send the received buffer out (echoing)
- * Simulate in Proteus v8, to simulate, 
+ * Simulate in Proteus v8, the diagram stays the same as transmit only, but with the following properties changed: 
  * tick the virtual terminal property: echo typed character (right click the opened virtual terminal while running to see this option)
  
  * Created: 5/21/2021 12:14:25 PM
