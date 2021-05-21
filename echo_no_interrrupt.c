@@ -1,8 +1,10 @@
 /*
  * UART.c
- * The first attempt on using Atmega328P to send strings to com port using UART
- * Simulate in Proteus v8
- * Created: 5/18/2021 2:50:25 PM
+ * Echoing string received by Atmega328P (from virtual/physical serial com port), and send the received buffer out (echoing)
+ * Simulate in Proteus v8, to simulate, 
+ * tick the virtual terminal property: echo typed character (right click the opened virtual terminal while running to see this option)
+ 
+ * Created: 5/21/2021 12:14:25 PM
  * Author : lzha711
  */ 
 
