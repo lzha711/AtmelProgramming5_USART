@@ -2,7 +2,7 @@
  * ADC_USART.c
  * read ADC from ADC1, and transmit the conversion result thru USART 
  * inspired and modified from https://gist.github.com/lrvdijk/803189
- * Modified on: 5/24/2021 12:37:20 PM
+ * Modified on: 5/27/2021 10:30:53 AM
  * Editor: lzha711
  */ 
 
@@ -11,6 +11,7 @@
 #endif
 
 #include <avr/io.h>
+#include <stdlib.h>
 #include <avr/interrupt.h>
 
 #define FOSC 8000000
@@ -18,6 +19,7 @@
 #define MyUBRR (FOSC/16/Baud - 1)
 
 unsigned char adc_index = 0; //ADC conversion times
+char adcindex_char[8];
 
 // usart initialization function
 void USART_init(uint16_t ubrr){
@@ -67,22 +69,25 @@ ISR(USART_RX_vect){
 
 // execute when adc conversion is complete:
 ISR(ADC_vect){
-	if (adc_index <6){
+	if (adc_index < 6){
 		adc_index ++;
 		ADC_init();
 		ADCSRA |= (1<<ADSC); //start next conversion
 	}else{
+		itoa(adc_index, adcindex_char, 10); //convert the adc conversion times into decimal number
 		adc_index = 0; //reset index
-		UCSR0B |= (1<<UDRIE0); //enable transmit interrupt
+		//enable transmit interrupt, this will trigger the UDRE interrupt vector
+		UCSR0B |= (1<<UDRIE0); 
 	}
 }
 
 //execute when transmit interrupt is enabled
 ISR(USART_UDRE_vect){
 	USART_transmit_string("After ");
-	USART_transmit_char(adc_index); // cannot show the times now
-	USART_transmit_string("times of ADC conversion, the result is:\r");
+	USART_transmit_string(adcindex_char); 
+	USART_transmit_string(" times of ADC conversion, the result is:\r");
 	USART_transmit_char(ADCH); //transmit the conversion result of adc, this appears as ASCII, how to change it to decimal?
+	USART_transmit_char('\r');
 	// Disable ADC conversion
 	ADCSRA &= ~(1<<ADEN);
 	// Disable this interrupt
