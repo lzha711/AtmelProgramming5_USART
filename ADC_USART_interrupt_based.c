@@ -19,8 +19,8 @@
 #define MyUBRR (FOSC/16/Baud - 1)
 
 unsigned char adc_index = 0; //ADC conversion times
-char adcindex_char[8];
-char adc_result[8];
+char adcindex_char[8]; // for itoa conversion
+char adc_result[8]; // for itoa conversion
 uint8_t adc_complete_flag = 0; //define adc completion flag
 
 // usart initialization function
@@ -82,9 +82,9 @@ ISR(ADC_vect){
 //execute when transmit interrupt is enabled
 ISR(USART_UDRE_vect){
 	USART_transmit_string("After ");
-	USART_transmit_string(adcindex_char); 
+	USART_transmit_string(adcindex_char); //display the decimal number 
 	USART_transmit_string(" times of ADC conversion, the result is:\r");
-	USART_transmit_string(adc_result); //transmit the conversion result of adc, this appears as ASCII, how to change it to decimal?
+	USART_transmit_string(adc_result); //disolay the result in decimal format
 	USART_transmit_char('\r');
 	// Disable this interrupt
 	UCSR0B &= ~(1 << UDRIE0);
