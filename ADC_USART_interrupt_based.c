@@ -2,7 +2,7 @@
  * ADC_USART.c
  * read ADC from ADC1, and transmit the conversion result thru USART 
  * inspired and modified from https://gist.github.com/lrvdijk/803189
- * Modified on: 5/27/2021 10:30:53 AM
+ * Modified on: 5/24/2021 12:37:20 PM
  * Editor: lzha711
  */ 
 
@@ -20,6 +20,8 @@
 
 unsigned char adc_index = 0; //ADC conversion times
 char adcindex_char[8];
+char adc_result[8];
+uint8_t adc_complete_flag = 0; //define adc completion flag
 
 // usart initialization function
 void USART_init(uint16_t ubrr){
@@ -71,13 +73,9 @@ ISR(USART_RX_vect){
 ISR(ADC_vect){
 	if (adc_index < 6){
 		adc_index ++;
-		ADC_init();
 		ADCSRA |= (1<<ADSC); //start next conversion
 	}else{
-		itoa(adc_index, adcindex_char, 10); //convert the adc conversion times into decimal number
-		adc_index = 0; //reset index
-		//enable transmit interrupt, this will trigger the UDRE interrupt vector
-		UCSR0B |= (1<<UDRIE0); 
+		adc_complete_flag = 1;
 	}
 }
 
@@ -86,7 +84,7 @@ ISR(USART_UDRE_vect){
 	USART_transmit_string("After ");
 	USART_transmit_string(adcindex_char); 
 	USART_transmit_string(" times of ADC conversion, the result is:\r");
-	USART_transmit_char(ADCH); //transmit the conversion result of adc, this appears as ASCII, how to change it to decimal?
+	USART_transmit_string(adc_result); //transmit the conversion result of adc, this appears as ASCII, how to change it to decimal?
 	USART_transmit_char('\r');
 	// Disable this interrupt
 	UCSR0B &= ~(1 << UDRIE0);
@@ -100,6 +98,17 @@ int main(void)
 	//enable interrupts
 	sei(); 
     while (1) 
-    {}
+    {
+		if(adc_complete_flag == 1){
+				itoa(adc_index, adcindex_char, 10); //convert adc conversion times into decimal number
+				itoa(ADCH, adc_result, 10); //convert adc result into decimal number
+				adc_index = 0; //reset index
+				//enable transmit interrupt, this will trigger the UDRE interrupt vector
+				UCSR0B |= (1<<UDRIE0);
+				adc_complete_flag = 0; //reset the flag
+		}else {
+			//do nothing
+		}
+	}
 }
 
