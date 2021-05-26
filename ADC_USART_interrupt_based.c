@@ -1,7 +1,7 @@
 /*
  * ADC_USART.c
  * read ADC from ADC1, and transmit the conversion result thru USART 
- * inspired and modified from https://gist.github.com/lrvdijk/803189
+ * inspired and modified from https://gist.github.com/lrvdijk/803189, https://www.avrfreaks.net/forum/solved-transmitting-adc-results-uart
  * Modified on: 5/24/2021 12:37:20 PM
  * Editor: lzha711
  */ 
