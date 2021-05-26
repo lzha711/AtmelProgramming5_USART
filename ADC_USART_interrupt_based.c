@@ -88,8 +88,6 @@ ISR(USART_UDRE_vect){
 	USART_transmit_string(" times of ADC conversion, the result is:\r");
 	USART_transmit_char(ADCH); //transmit the conversion result of adc, this appears as ASCII, how to change it to decimal?
 	USART_transmit_char('\r');
-	// Disable ADC conversion
-	ADCSRA &= ~(1<<ADEN);
 	// Disable this interrupt
 	UCSR0B &= ~(1 << UDRIE0);
 }
