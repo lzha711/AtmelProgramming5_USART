@@ -9,7 +9,6 @@
  */ 
 
 #define F_CPU 8000000UL
-#define PRIME_RANGE 300		//Prime numbers are checked from 0 to PRIME_RANGE
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -25,9 +24,10 @@
 /*====== for FOSC = 1M, BAUD=9600, MyUBRR is calculated 5.51, after rounding up the error rate
   ====== is high, communication will not be successful.  */
 
-#define RXBufSize 100
+#define PRIME_RANGE 300 // checking number range
+#define RXBufSize 100 //for echoing, not needed in this lab
 char RXBuf[RXBufSize];
-static uint8_t digits[3] = {0,0,0};	//Initializing array holding the 3 digits to be sent to printing
+static uint8_t digits[3] = {0,0,0};	//Initializing a 3 digit array
  
 
 /* define initialization function */
@@ -57,7 +57,7 @@ void USART0_transmit_string(char* s){
 	while(*s > 0) USART0_transmit_char(*s++);
 }
 
-/* RECEIVE A CHARACTER */
+/* RECEIVE A CHARACTER (Not needed in this lab)*/
 unsigned char USART0_receive_char(){
 	// wait for data to be ready
 	while (BIT_IS_CLEAR(UCSR0A, RXC0))
@@ -65,7 +65,7 @@ unsigned char USART0_receive_char(){
 	return UDR0;
 }
 
-/* RECEIVE A STRING LINE */
+/* RECEIVE A STRING LINE (Not needed in this lab)*/
 void USART0_receive_string(char* buf, uint8_t n){
 	uint8_t bufIdx = 0;
 	unsigned char c;
@@ -86,31 +86,31 @@ void USART0_receive_string(char* buf, uint8_t n){
 //Function returns 1 if chk_no is a prime
 uint8_t check_prime(uint16_t chk_no){
 	for(uint16_t i=2; i<chk_no; i++){
-		if( (chk_no % i) == 0){					//If chk_no can be divided by a number less than that its not a prime
-			return 0;							//Return false to the function caller
+		if( (chk_no % i) == 0){	 //a number that can be divided by number less than itself is not a prime
+			return 0;	 //Return FALSE
 		}
 	}
-	return 1;									//If chk_no cannot be divided by a number less than that its a prime
+	return 1;			 //If chk_no cannot be divided by a number less than itself, it is a prime
 }
 
 
 void print_3digit_number(uint16_t number, uint8_t* digits){
-	digits[0] = number%10;					//First digit
-	digits[1] = (number/10)%10;				//Second digit
-	digits[2] = (number/100)%10;			//Third digit
+	digits[0] = number%10;			//First digit
+	digits[1] = (number/10)%10;		//Second digit
+	digits[2] = (number/100)%10;		//Third digit
 	
 	for(uint8_t i = 3; i>0; i--){
 		USART0_transmit_char(digits[i-1]+48);		//Transmitting each digit one at a time
 	}
-	USART0_transmit_char(10);						//Add new line
-	USART0_transmit_char(13);						//Add return
+	USART0_transmit_char(10);				//Line feed
+	USART0_transmit_char(13);			        //carriage return
 }
 
 
 // main program
 int main(void)
 {
-    USART0_init(MyUBRR);
+    	USART0_init(MyUBRR);
 	// sei(); //enable interrupt
 	
 	uint16_t prime_array[62];
@@ -128,7 +128,7 @@ int main(void)
 	USART0_transmit_string("Total number of primes are: ");
 	print_3digit_number(prime_index, digits); //print the total number of primes
 	
-    while (1) {	
+    	while (1) {	
 		// do nothing	
 	}
 	return(0); // should never get here
